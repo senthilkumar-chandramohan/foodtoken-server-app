@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/consumer/send-token
+Content-Type: application/json
+
+{
+"fromAccountID": "9940213539", "toAccountID": "9962589489", "amount": 10, "note": "06Jan2024"
+}
+
+#GET https://localhost:3001/api/common/get-balance?accID=9962589489 Content-Type: application/json
+
