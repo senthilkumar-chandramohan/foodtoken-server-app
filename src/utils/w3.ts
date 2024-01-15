@@ -4,11 +4,8 @@ let web3Instance:any = null;
 
 const getWeb3Instance = () => {
     if (!web3Instance) {
-        const network = process.env.ETHEREUM_NETWORK || "goerli";
-        web3Instance = new Web3(
-            new Web3.providers.HttpProvider (
-                `https://${network}.infura.io/v3/${process.env.INFURA_API_KEY}`
-            )
+        web3Instance = new Web3 (
+            new Web3.providers.HttpProvider(process.env.POLYGON_HTTP_PROVIDER || '')
         );
     }
 

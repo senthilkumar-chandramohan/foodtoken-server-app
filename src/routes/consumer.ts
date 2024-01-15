@@ -1,8 +1,9 @@
 import express from "express";
 import { sendToken } from "../modules/index";
-import { ACCOUNT_DETAILS_MAP } from "../utils/constants";
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 router.post("/send-token", async (req, res) => {
     const {
@@ -13,15 +14,22 @@ router.post("/send-token", async (req, res) => {
         note,
       },
     } = req;
-  
-    const fromWalletAddress = ACCOUNT_DETAILS_MAP[fromAccountID].wallet;
-    const toWalletAddress = ACCOUNT_DETAILS_MAP[toAccountID].wallet;
-  
-    console.log("fromWallet", fromWalletAddress);
-    console.log("toWallet", toWalletAddress);
-  
+
+    // Get both sender and receiver wallet details
+    const queryWallet = await prisma.user.findMany({
+      where: {
+        id: { in: [fromAccountID, toAccountID]}
+      },
+      select: {
+        id: true,
+        walletId: true
+      }
+    });
+
+    const fromWalletAddress = queryWallet.find(wallet => wallet.id === fromAccountID)?.walletId || '';
+    const toWalletAddress = queryWallet.find(wallet => wallet.id === toAccountID)?.walletId || '';
     const receipt = await sendToken(fromWalletAddress, toWalletAddress, amount, note);
-    res.json(receipt);
+    res.status(200).json(receipt);
   });
 
 export default router;

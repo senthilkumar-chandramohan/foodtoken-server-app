@@ -1,28 +1,32 @@
-import dotenv from "dotenv";
 import { getWeb3Instance, getBigNumber, constants } from "../utils/index";
+import { PrismaClient } from '@prisma/client';
 
-dotenv.config();
+const prisma = new PrismaClient();
 
 const sendToken = async (sender:string, receiver:string, amount:number, note:string) => {
     const web3 = getWeb3Instance();
 
+    const {
+        CONTRACT_ABI,
+        CONTRACT_ADDRESS,
+        DECIMALS,
+        SYSTEM_WALLET,
+        CHAIN_ID,
+        SIGNER_PRIVATE_KEY,
+    } = constants;
+
     const contract = new web3.eth.Contract(
-        constants.CONTRACT_ABI,
-        constants.CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        CONTRACT_ADDRESS,
     );
 
-    const amountBN = getBigNumber(amount).mul(getBigNumber(constants.DECIMALS));
-    console.log(amountBN);
-
+    const amountBN = getBigNumber(amount).mul(getBigNumber(DECIMALS));
     const txn = contract.methods.transferFrom(sender, receiver, amountBN);
-    const gas = await txn.estimateGas({ from: constants.SYSTEM_WALLET });
+    const gas = await txn.estimateGas({ from: SYSTEM_WALLET });
     const gasPrice = await web3.eth.getGasPrice();
     const data = txn.encodeABI();
-    const nonce = await web3.eth.getTransactionCount(constants.SYSTEM_WALLET);
-
-    console.log('\n gas:', gas);
-    console.log('\n gasPrice:', gasPrice);
-    console.log('\n nonce:', nonce);
+    const nonce = await web3.eth.getTransactionCount(SYSTEM_WALLET);
+    const chainId = CHAIN_ID;
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -30,8 +34,8 @@ const sendToken = async (sender:string, receiver:string, amount:number, note:str
         gas,
         gasPrice,
         nonce,
-        chainId: 5,
-    }, constants.PRIVATE_KEY);
+        chainId,
+    }, SIGNER_PRIVATE_KEY);
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
     return receipt;
@@ -55,36 +59,58 @@ const getBalance = async (address:string) => {
     );
 
     const balance = await contract.methods.balanceOf(address).call();
-    return balance/BigInt(DECIMALS);
+    return balance/DECIMALS;
 };
 
 const getTransactionHistory = async (address:string) => {
-    const apiKey="VVCPGMJQZ2IZ2FQUT7K79HS2K4SEA6AVB9";
-    const reqUrl=`https://api-goerli.etherscan.io/api?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
+    const {
+        DECIMALS,
+        POLYGONSCAN_API_KEY,
+    } = constants;
+
+    const apiKey = POLYGONSCAN_API_KEY;
+    const reqUrl=`https://api-testnet.polygonscan.com/api?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
 
     const response = await fetch(reqUrl, { method: 'GET' });
     const responseJSON = await response.json();
 
-    const {
-        WALLET_NAME_MAP,
-        DECIMALS,
-    } = constants;
+    const allTxnWallets = [
+        ...responseJSON.result.map((transaction:any) => transaction.to),
+        ...responseJSON.result.map((transaction:any) => transaction.from)
+    ];
+
+    const walletIDNameMap = await prisma.user.findMany({
+        where: {
+            walletId: {
+                in: allTxnWallets,
+                mode: 'insensitive'
+            }
+        },
+        select: {
+            walletId: true,
+            fname: true,
+            lname: true
+        }
+    });
 
     const filteredResponse = responseJSON.result.map((transaction:any) => {
         const {
             timeStamp,
+            from,
             to,
             value,
             hash,
         } = transaction;
 
-        const txnType = to === address.toLowerCase() ? "CREDIT" : "PAYMENT";
-        const txnTo = WALLET_NAME_MAP[to];
+        const txnType = to === address.toLowerCase() ? "CREDIT" : "DEBIT";
+        const fromWallet = walletIDNameMap.find(wallet=>wallet.walletId.toLowerCase() === from.toLowerCase());
+        const toWallet = walletIDNameMap.find(wallet=>wallet.walletId.toLowerCase() === to.toLowerCase());
 
         return {
             timeStamp,
             txnType,
-            to: txnTo,
+            ...(txnType === "CREDIT" && {from: fromWallet?.fname + ' ' + fromWallet?.lname}),
+            ...(txnType === "DEBIT" && {to: toWallet?.fname + ' ' + toWallet?.lname}),
             value: value/DECIMALS,
             hash,
         };
