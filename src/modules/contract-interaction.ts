@@ -66,6 +66,7 @@ const getTransactionHistory = async (address:string) => {
     const {
         DECIMALS,
         POLYGONSCAN_API_KEY,
+        TRANSACTION_TYPE,
     } = constants;
 
     const apiKey = POLYGONSCAN_API_KEY;
@@ -79,7 +80,7 @@ const getTransactionHistory = async (address:string) => {
         ...responseJSON.result.map((transaction:any) => transaction.from)
     ];
 
-    const walletIDNameMap = await prisma.user.findMany({
+    const walletIDNameMap = await prisma.users.findMany({
         where: {
             walletId: {
                 in: allTxnWallets,
@@ -88,8 +89,8 @@ const getTransactionHistory = async (address:string) => {
         },
         select: {
             walletId: true,
-            fname: true,
-            lname: true
+            firstName: true,
+            lastName: true
         }
     });
 
@@ -102,15 +103,15 @@ const getTransactionHistory = async (address:string) => {
             hash,
         } = transaction;
 
-        const txnType = to === address.toLowerCase() ? "CREDIT" : "DEBIT";
+        const txnType = to === address.toLowerCase() ? TRANSACTION_TYPE.CREDIT : TRANSACTION_TYPE.DEBIT;
         const fromWallet = walletIDNameMap.find(wallet=>wallet.walletId.toLowerCase() === from.toLowerCase());
         const toWallet = walletIDNameMap.find(wallet=>wallet.walletId.toLowerCase() === to.toLowerCase());
 
         return {
             timeStamp,
             txnType,
-            ...(txnType === "CREDIT" && {from: fromWallet?.fname + ' ' + fromWallet?.lname}),
-            ...(txnType === "DEBIT" && {to: toWallet?.fname + ' ' + toWallet?.lname}),
+            ...(txnType === TRANSACTION_TYPE.CREDIT && {from: fromWallet?.firstName + ' ' + fromWallet?.lastName}),
+            ...(txnType === TRANSACTION_TYPE.DEBIT && {to: toWallet?.firstName + ' ' + toWallet?.lastName}),
             value: value/DECIMALS,
             hash,
         };

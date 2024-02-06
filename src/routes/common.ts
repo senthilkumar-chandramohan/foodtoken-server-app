@@ -1,6 +1,8 @@
 import express from 'express';
-import { getBalance, getTransactionHistory } from '../modules/index';
+import webPush from 'web-push';
 import { PrismaClient } from '@prisma/client';
+
+import { getBalance, getTransactionHistory } from '../modules/index';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -17,7 +19,7 @@ router.get("/get-balance", async (req, res) => {
         });
     }
 
-    const queryWallet = await prisma.user.findUnique({
+    const queryWallet = await prisma.users.findUnique({
         where: {
             id: accountID as string
         },
@@ -25,10 +27,10 @@ router.get("/get-balance", async (req, res) => {
             walletId: true
         }
     });
-    const walletAddress: string = queryWallet?.walletId || '';
 
-    console.log("wallet", walletAddress);
+    const walletAddress: string = queryWallet?.walletId || '';
     const balance = await getBalance(walletAddress);
+
     res.status(200).json({ balance: balance.toString() });
 });
 
@@ -43,7 +45,7 @@ router.get("/get-txn-history", async (req, res) => {
         });
     }
 
-    const queryWallet = await prisma.user.findUnique({
+    const queryWallet = await prisma.users.findUnique({
         where: {
             id: accountID as string
         },
@@ -56,6 +58,77 @@ router.get("/get-txn-history", async (req, res) => {
     const txnHistory = await getTransactionHistory(walletAddress);
 
     res.status(200).json({ txnHistory });
+});
+
+router.get("/get-app-server-key", async (req, res) => {
+    const {
+      query: {
+        accountID,
+      }
+    } = req;
+
+    const queryVapidKeys = await prisma.users.findUnique({
+        where: {
+            id: accountID as string
+        },
+        select: {
+            vapidKeys: true
+        }
+    });
+
+    let vapidKeys: any = queryVapidKeys?.vapidKeys;
+
+    if (!vapidKeys) {
+        vapidKeys = webPush.generateVAPIDKeys();
+        const result = await prisma.users.update({
+            where: {
+                id: accountID as string
+            },
+            data: {
+                vapidKeys: vapidKeys
+            }
+        });
+    }
+
+    const { publicKey } = vapidKeys;  
+    res.json({ publicKey });
+});
+
+router.post("/add-subscription", async (req, res) => {
+    const {
+      body,
+      query: {
+        accountID,
+      }
+    } = req;
+
+    const result: any = await prisma.users.update({
+        where: {
+            id: accountID as string
+        },
+        data: {
+            subscription: body
+        }
+    });
+  
+    const {
+        vapidKeys: {
+            publicKey,
+            privateKey,
+        }
+    } = result;
+    
+    webPush.setVapidDetails(
+      'mailto:your-email@example.com',
+      publicKey,
+      privateKey
+    );
+  
+    const payload = JSON.stringify({ title: 'Push Notification Test' });
+    webPush.sendNotification(body, payload)
+      .catch(error => console.error(error));
+  
+    res.json({status: 'success'});
 });
   
 export default router;

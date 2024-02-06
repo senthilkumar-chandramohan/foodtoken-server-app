@@ -16,7 +16,7 @@ router.post("/send-token", async (req, res) => {
     } = req;
 
     // Get both sender and receiver wallet details
-    const queryWallet = await prisma.user.findMany({
+    const queryWallet = await prisma.users.findMany({
       where: {
         id: { in: [fromAccountID, toAccountID]}
       },

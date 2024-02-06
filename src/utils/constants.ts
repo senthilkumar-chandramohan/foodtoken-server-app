@@ -17,6 +17,16 @@ const CONTRACT_ABI = JSON.parse(contractABIBuffer.toString('utf-8'));
 
 const DECIMALS = 1000000000000000000;
 
+const ACCOUNT_TYPE = {
+    CONSUMER: 'consumer',
+    MERCHANT: 'merchant'
+};
+
+const TRANSACTION_TYPE = {
+    CREDIT: 'credit',
+    DEBIT: 'debit'
+};
+
 export {
     SYSTEM_WALLET,
     SIGNER_PRIVATE_KEY,
@@ -26,4 +36,6 @@ export {
 	POLYGONSCAN_API_KEY,
 	CHAIN_ID,
 	POLYGON_WS_PROVIDER,
+    ACCOUNT_TYPE,
+    TRANSACTION_TYPE,
 };

@@ -25,7 +25,7 @@ const prisma = new PrismaClient();
 
         // console.log(JSON.stringify(info, null, 4));
 
-        const wallets = await prisma.user.findMany({
+        const wallets = await prisma.users.findMany({
             where: {
                 walletId: {
                     in: [to, from],
@@ -34,20 +34,20 @@ const prisma = new PrismaClient();
             },
             select: {
                 walletId: true,
-                webPushData: true,
-                fname: true,
-                lname: true,
+                vapidKeys: true,
+                subscription: true,
+                firstName: true,
+                lastName: true,
             }
         });
 
-        const fromWallet = wallets.find(wallet=>wallet.walletId.toLowerCase() === from.toLowerCase());
-        const toWallet = wallets.find(wallet=>wallet.walletId.toLowerCase() === to.toLowerCase());
+        const fromWallet: any = wallets.find(wallet=>wallet.walletId.toLowerCase() === from.toLowerCase());
+        const toWallet: any = wallets.find(wallet=>wallet.walletId.toLowerCase() === to.toLowerCase());
 
-        const webPushData: any = toWallet?.webPushData;
         const {
             vapidKeys,
             subscription,
-        } = webPushData;
+        } = toWallet;
         
         webPush.setVapidDetails(
             "mailto:your-email@example.com",
@@ -57,7 +57,7 @@ const prisma = new PrismaClient();
 
         const payload = JSON.stringify({
             title: `You have received ₹${ethers.utils.formatUnits(value, 18)}`,
-            body: `from ${fromWallet?.fname}`,
+            body: `from ${fromWallet?.firstName}`,
             icon: 'test.png'
         });
 

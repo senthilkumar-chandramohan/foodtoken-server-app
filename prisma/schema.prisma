@@ -10,13 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id String @id
   email String @unique
-  fname String
-  lname String
+  firstName String
+  lastName String
   walletId String @unique
-  webPushData Json
+  vapidKeys Json
+  subscription Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
