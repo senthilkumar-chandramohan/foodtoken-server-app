@@ -9,12 +9,12 @@ import "./modules/txn-listener";
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors({
-  origin: ["https://localhost:3000","https://192.168.0.112:3000"]
+  origin: ["https://localhost:3000","https://foodtoken-web-app.vercel.app"]
 }));
 
 // Initialize Firebase Admin SDK
