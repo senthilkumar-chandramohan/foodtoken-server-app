@@ -14,7 +14,7 @@ const port = process.env.PORT || 3001;
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors({
-  origin: ["https://localhost:3000","https://foodtoken-web-app.vercel.app"]
+  origin: ["https://localhost:3000","https://foodtoken-web.vercel.app"]
 }));
 
 // Initialize Firebase Admin SDK
