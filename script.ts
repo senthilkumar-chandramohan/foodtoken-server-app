@@ -4,10 +4,11 @@ const prisma = new PrismaClient();
 async function main() {
     const user = await prisma.users.createMany({
         data: [{
-            id: '9940213539',
-            email: 'shobana.senthil94@gmail.com',
-            firstName: 'Shobana',
-            lastName: 'S',
+            id: 'Pb4kwoXtUFavdCP6QKwR0TMru3n2',
+            phoneNumber: '9940213539',
+            email: 'senthilkumar.chandramohan@outlook.com',
+            firstName: 'Senthil',
+            lastName: 'Chandramohan',
             walletId: '0xEEEDab9cAc42Ad100dBed36A1467ae545F83C6Fc',
             vapidKeys: {
                 'publicKey': 'BKqgl7rhPZ6pXFIKRoGKRcHYVaWJlZD-aR391c4GVoogO1UV2qOGeHrfAMTUY8zr_jWNQijp0ZzK5-UAifmaVqY',
@@ -22,7 +23,8 @@ async function main() {
                 }
             }
         }, {
-            id: '9962589489',
+            id: 'o14NcqGsEhfTpxx1U6yfOXsuffu1',
+            phoneNumber: '9962589489',
             email: 'senthil83kumar@gmail.com',
             firstName: 'Senthil',
             lastName: 'Chandramohan',

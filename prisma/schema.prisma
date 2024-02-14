@@ -13,6 +13,7 @@ datasource db {
 model Users {
   id String @id
   email String @unique
+  phoneNumber String @unique
   firstName String
   lastName String
   walletId String @unique

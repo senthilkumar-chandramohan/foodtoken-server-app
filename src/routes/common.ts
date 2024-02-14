@@ -10,18 +10,12 @@ const prisma = new PrismaClient();
 // Common routes go here
 router.get("/get-balance", async (req, res) => {
     const {
-        query: { accountID },
-    } = req;
-    
-    if (!accountID) {
-        return res.status(400).json({
-            error: "accountID is required",
-        });
-    }
+        uid
+    } = req.user;
 
     const queryWallet = await prisma.users.findUnique({
         where: {
-            id: accountID as string
+            id: uid as string
         },
         select: {
             walletId: true
@@ -36,18 +30,12 @@ router.get("/get-balance", async (req, res) => {
 
 router.get("/get-txn-history", async (req, res) => {
     const {
-        query: { accountID },
-    } = req;
-    
-    if (!accountID) {
-        return res.status(400).json({
-            error: "accountID is required",
-        });
-    }
+        uid
+    } = req.user;
 
     const queryWallet = await prisma.users.findUnique({
         where: {
-            id: accountID as string
+            id: uid as string
         },
         select: {
             walletId: true
@@ -62,14 +50,12 @@ router.get("/get-txn-history", async (req, res) => {
 
 router.get("/get-app-server-key", async (req, res) => {
     const {
-      query: {
-        accountID,
-      }
-    } = req;
+        uid
+    } = req.user;
 
     const queryVapidKeys = await prisma.users.findUnique({
         where: {
-            id: accountID as string
+            id: uid as string
         },
         select: {
             vapidKeys: true
@@ -82,7 +68,7 @@ router.get("/get-app-server-key", async (req, res) => {
         vapidKeys = webPush.generateVAPIDKeys();
         const result = await prisma.users.update({
             where: {
-                id: accountID as string
+                id: uid as string
             },
             data: {
                 vapidKeys: vapidKeys
@@ -97,14 +83,15 @@ router.get("/get-app-server-key", async (req, res) => {
 router.post("/add-subscription", async (req, res) => {
     const {
       body,
-      query: {
-        accountID,
-      }
     } = req;
+
+    const {
+        uid
+    } = req.user;
 
     const result: any = await prisma.users.update({
         where: {
-            id: accountID as string
+            id: uid as string
         },
         data: {
             subscription: body
