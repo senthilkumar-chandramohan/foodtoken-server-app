@@ -1,4 +1,4 @@
-POST http://localhost:3002/api/common/add-subscription?accountID=9962589489
+POST http://localhost:3002/api/common/add-subscription
 Content-Type: application/json
 
 {
@@ -14,9 +14,9 @@ Content-Type: application/json
 # Content-Type: application/json
 
 # {
-#     "fromAccountID": "9940213539", "toAccountID": "9962589489", "amount": 8, "note": "16Jan2024"
+#     "toUserId": "9962589489", "amount": 8, "note": "16Jan2024"
 # }
 
-#GET http://localhost:3002/api/common/get-balance?accountID=9962589489
+#GET http://localhost:3002/api/common/get-balance
 
 # GET http://localhost:3002/api/common/get-app-server-key?accountID=9962589489
