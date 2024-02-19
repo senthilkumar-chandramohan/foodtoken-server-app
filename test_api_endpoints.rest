@@ -1,14 +1,14 @@
-POST http://localhost:3002/api/common/add-subscription
-Content-Type: application/json
+# POST http://localhost:3002/api/common/add-subscription
+# Content-Type: application/json
 
-{
-    "endpoint": "https://updates.push.services.mozilla.com/wpush/v1/gAAAAABj883ZWDlfe4FedGHdlkQrADJbc_1Zz0i9d7rCBhX5TPT24NySUG3TIIDca_uQ8Tk5HmYfOqZ1I3ojMoTY-z3h2vYs4wnS0c23mo5vkCqins3HU8RX4z_tQCSx0a6a5rfYkgea",
-    "expirationTime": null,
-    "keys": {
-        "auth": "4WMH-ZHeNpSMmWUE_eWGSw",
-        "p256dh": "BBnQ7CMylnQRb9yOr0PZH_obtSiVMIzXslRG482Xk3P6Dw3LZW2bn3SnuUSp2g-n561V_b-fjkSNWKmg28_AWD8"
-    }
-}
+# {
+#     "endpoint": "https://updates.push.services.mozilla.com/wpush/v1/gAAAAABj883ZWDlfe4FedGHdlkQrADJbc_1Zz0i9d7rCBhX5TPT24NySUG3TIIDca_uQ8Tk5HmYfOqZ1I3ojMoTY-z3h2vYs4wnS0c23mo5vkCqins3HU8RX4z_tQCSx0a6a5rfYkgea",
+#     "expirationTime": null,
+#     "keys": {
+#         "auth": "4WMH-ZHeNpSMmWUE_eWGSw",
+#         "p256dh": "BBnQ7CMylnQRb9yOr0PZH_obtSiVMIzXslRG482Xk3P6Dw3LZW2bn3SnuUSp2g-n561V_b-fjkSNWKmg28_AWD8"
+#     }
+# }
 
 # POST http://localhost:3002/api/consumer/send-token
 # Content-Type: application/json
@@ -20,3 +20,5 @@ Content-Type: application/json
 #GET http://localhost:3002/api/common/get-balance
 
 # GET http://localhost:3002/api/common/get-app-server-key?accountID=9962589489
+
+GET http://localhost:3001/api/common/ping

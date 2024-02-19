@@ -5,13 +5,32 @@ import { PrismaClient } from '@prisma/client';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/send-token", async (req, res) => {
+router.get("/sellers", async (req, res) => {
+  const {
+    value = '',
+  } = req.query;
+
+  const querySellers = await prisma.users.findMany({
+    where: {
+      OR: [
+        { email: { startsWith: value as string } },
+        { phoneNumber: { startsWith: value as string } },
+      ]
+    },
+    select: {
+      id: true,
+      firstName: true,
+    }
+  });
+
+  res.status(200).json(querySellers);
+});
+
+router.post("/token", async (req, res) => {
   const fromUserId = req.user.uid;
   const {
     body: {
       toUserId = '',
-      toEmailId = '',
-      toPhoneNumber = '',
       amount,
       note,
     },
@@ -23,8 +42,6 @@ router.post("/send-token", async (req, res) => {
       OR: [
         { id: { equals: fromUserId } },
         { id: { equals: toUserId } },
-        { email: { equals: toEmailId } },
-        { phoneNumber: { equals: toPhoneNumber } },
       ]
     },
     select: {
@@ -35,14 +52,21 @@ router.post("/send-token", async (req, res) => {
     }
   });
 
-  // Find From Wallet address by account ID
+  // Find From address
   const fromWalletAddress = queryWallet.find(wallet => wallet.id === fromUserId)?.walletId || '';
-  // Find To Wallet address by userId (OR) Email ID (OR) Phone Number
-  const toWalletAddress = queryWallet.find(wallet => wallet.id === toUserId || wallet.email === toEmailId || wallet.phoneNumber === toPhoneNumber)?.walletId || '';
+  // Find To address
+  const toWalletAddress = queryWallet.find(wallet => wallet.id === toUserId)?.walletId || '';
 
   // Send Token
-  const receipt = await sendToken(fromWalletAddress, toWalletAddress, parseFloat(amount), note);
+  if (!fromWalletAddress) {
+    res.status(400).json({"error": "Error, please sign-in and try again!"});
+  }
 
+  if (!toWalletAddress) {
+    res.status(400).json({"error": "Error, seller doesn't exist, please try again!"});
+  } 
+
+  const receipt = await sendToken(fromWalletAddress, toWalletAddress, parseFloat(amount), note);
   res.status(200).json(receipt);
 });
 
