@@ -8,6 +8,18 @@ const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
 const CHAIN_ID = process.env.CHAIN_ID;
 const POLYGON_WS_PROVIDER = process.env.POLYGON_WS_PROVIDER;
 
+const DECIMALS = 1000000000000000000;
+
+const ACCOUNT_TYPE = {
+    CONSUMER: 'consumer',
+    MERCHANT: 'merchant'
+};
+
+const TRANSACTION_TYPE = {
+    CREDIT: 'credit',
+    DEBIT: 'debit'
+};
+
 const CONTRACT_ABI = [
 	{
 		"inputs": [],
@@ -692,18 +704,6 @@ const CONTRACT_ABI = [
 		"type": "function"
 	}
 ];
-
-const DECIMALS = 1000000000000000000;
-
-const ACCOUNT_TYPE = {
-    CONSUMER: 'consumer',
-    MERCHANT: 'merchant'
-};
-
-const TRANSACTION_TYPE = {
-    CREDIT: 'credit',
-    DEBIT: 'debit'
-};
 
 export {
     SYSTEM_WALLET,

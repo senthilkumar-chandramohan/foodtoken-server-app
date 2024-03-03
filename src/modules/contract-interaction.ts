@@ -1,5 +1,15 @@
-import { getWeb3Instance, getBigNumber, constants } from "../utils/index";
 import { PrismaClient } from '@prisma/client';
+import { Wallet, ethers } from "ethers";
+import { splitSignature } from "ethers/lib/utils.js";
+
+import {
+  SIGNER_PRIVATE_KEY,
+  CONTRACT_ABI,
+  CONTRACT_ADDRESS,
+  CHAIN_ID,
+} from "../utils/constants";
+
+import { getWeb3Instance, getBigNumber, constants } from "../utils/index";
 
 const prisma = new PrismaClient();
 
@@ -120,8 +130,121 @@ const getTransactionHistory = async (address:string) => {
     return filteredResponse;
 };
 
+const _getPermitSignature = async (
+  wallet: any,
+  spender: any,
+  value: any,
+  deadline: any,
+  contractAddress: any,
+  permitConfig: any,
+) => {
+  const {
+      nonce,
+      name,
+      version,
+      chainId
+  } = permitConfig;
+
+  return splitSignature (
+    await wallet._signTypedData(
+      {
+        name,
+        version,
+        chainId,
+        verifyingContract: contractAddress,
+      },
+      {
+        Permit: [
+          {
+            name: 'owner',
+            type: 'address',
+          },
+          {
+            name: 'spender',
+            type: 'address',
+          },
+          {
+            name: 'value',
+            type: 'uint256',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+          },
+          {
+            name: 'deadline',
+            type: 'uint256',
+          },
+        ],
+      },
+      {
+        owner: wallet.address,
+        spender,
+        value,
+        nonce,
+        deadline,
+      }
+    )
+  );
+}
+
+const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
+  const signer = new ethers.Wallet(SIGNER_PRIVATE_KEY || '');
+  const ownerAddress = wallet.address;
+  const spenderAddress = signer.address;
+  const value = ethers.constants.MaxUint256; // Unlimited balance
+  const nonce = 0; // Setting to 0 since Permit is executed only once for a wallet
+  const deadline = ethers.constants.MaxUint256; // Unlimited timeframe
+
+  const web3 = getWeb3Instance();
+
+  console.log("web3 instance created");
+
+  const abi = CONTRACT_ABI;
+  const chainId = CHAIN_ID;
+  const name = "FoodToken";
+  const version = "1";
+
+  const permitConfig = {
+      nonce,
+      name,
+      version,
+      chainId,
+  };
+
+  const contractAddress = CONTRACT_ADDRESS;
+  const permitSignature = await _getPermitSignature(wallet, spenderAddress, value, deadline, contractAddress, permitConfig);
+
+  const { v, r, s } = permitSignature;
+
+  // Call Permit method in contract
+  const contract = new web3.eth.Contract(
+      abi,
+      contractAddress,
+  );
+
+  const txn = contract.methods.permit(ownerAddress, spenderAddress, value, deadline, v, r, s);
+  const gas = await txn.estimateGas({ from: signer.address });
+  const gasPrice = await web3.eth.getGasPrice();
+  const data = txn.encodeABI();
+  const accountNonce = await web3.eth.getTransactionCount(signer.address);
+
+  const signedTxn = await web3.eth.accounts.signTransaction({
+      to: contract.options.address,
+      data,
+      gas,
+      gasPrice,
+      nonce: accountNonce,
+      chainId,
+  }, process.env.SIGNER_PRIVATE_KEY);
+
+  const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
+  console.log(receipt);
+}
+
 export {
     sendToken,
     getBalance,
     getTransactionHistory,
+    provideTransferPermissionToSystemAccount,
 };

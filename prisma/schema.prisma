@@ -12,13 +12,15 @@ datasource db {
 
 model Users {
   id String @id
+  picture String?
   email String @unique
   phoneNumber String @unique
   firstName String
   lastName String
   walletId String @unique
-  vapidKeys Json
-  subscription Json
+  privateKey String?
+  vapidKeys Json?
+  subscription Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

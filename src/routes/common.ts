@@ -1,19 +1,19 @@
-import express from 'express';
-import webPush from 'web-push';
-import { PrismaClient } from '@prisma/client';
-import ip3country from 'ip3country';
+import express from "express";
+import webPush from "web-push";
+import { PrismaClient } from "@prisma/client";
 
 import { getBalance, getTransactionHistory } from '../modules/index';
+import { createAccount, loginUser } from "../controllers";
 
 const router = express.Router();
 const prisma = new PrismaClient();
-ip3country.init();
 
-router.get("/user-country", (req, res) => {
-  const { ip = '' } = req;
+router.post("/signup", async (req, res) => {
+  createAccount(req, res);
+});
 
-  const country = ip3country.lookupStr(ip) || 'IN';
-  res.status(200).json({ country });
+router.get("/login", async (req, res) => {
+  loginUser(req, res);
 });
 
 router.get("/get-balance", async (req, res) => {

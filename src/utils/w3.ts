@@ -1,4 +1,6 @@
-import Web3 from 'web3';
+import Web3 from "web3";
+import crypto from "crypto";
+import { ethers } from "ethers";
 
 let web3Instance:any = null;
 
@@ -17,7 +19,16 @@ const getBigNumber = (number:number) => {
     return web3.utils.toBN(number);
 };
 
+const createWallet = () => {
+    const id = crypto.randomBytes(32).toString('hex');
+    const privateKey = "0x" + id;
+
+    const wallet = new ethers.Wallet(privateKey);
+    return { privateKey, wallet };
+};
+
 export {
     getWeb3Instance,
     getBigNumber,
+    createWallet,
 };
