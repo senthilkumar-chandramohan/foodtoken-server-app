@@ -48,21 +48,23 @@ const prisma = new PrismaClient();
             vapidKeys,
             subscription,
         } = toWallet;
-        
-        webPush.setVapidDetails(
-            "mailto:your-email@example.com",
-            vapidKeys.publicKey,
-            vapidKeys.privateKey
-          );
 
-        const payload = JSON.stringify({
-            title: `You have received ₹${ethers.utils.formatUnits(value, 18)}`,
-            body: `from ${fromWallet?.firstName}`,
-            icon: 'test.png'
-        });
+        if (vapidKeys && subscription) {
+            webPush.setVapidDetails(
+                "mailto:your-email@example.com",
+                vapidKeys.publicKey,
+                vapidKeys.privateKey
+            );
 
-        webPush.sendNotification(subscription, payload)
-            .catch((error: any) => console.error(error));
+            const payload = JSON.stringify({
+                title: `You have received ₹${ethers.utils.formatUnits(value, 18)}`,
+                body: `from ${fromWallet?.firstName}`,
+                icon: 'test.png'
+            });
+
+            webPush.sendNotification(subscription, payload)
+                .catch((error: any) => console.error(error));
+        }
     });
     console.log("Started listening for Transfer events...");
 })();

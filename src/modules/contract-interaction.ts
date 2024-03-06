@@ -2,13 +2,6 @@ import { PrismaClient } from '@prisma/client';
 import { Wallet, ethers } from "ethers";
 import { splitSignature } from "ethers/lib/utils.js";
 
-import {
-  SIGNER_PRIVATE_KEY,
-  CONTRACT_ABI,
-  CONTRACT_ADDRESS,
-  CHAIN_ID,
-} from "../utils/constants";
-
 import { getWeb3Instance, getBigNumber, constants } from "../utils/index";
 
 const prisma = new PrismaClient();
@@ -189,6 +182,13 @@ const _getPermitSignature = async (
 }
 
 const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
+  const {
+    CONTRACT_ABI,
+    CONTRACT_ADDRESS,
+    CHAIN_ID,
+    SIGNER_PRIVATE_KEY,
+  } = constants;
+
   const signer = new ethers.Wallet(SIGNER_PRIVATE_KEY || '');
   const ownerAddress = wallet.address;
   const spenderAddress = signer.address;
@@ -242,9 +242,60 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
   console.log(receipt);
 }
 
+const mintTokens = async (address: any, amount: any) => {
+  const {
+    CONTRACT_ABI,
+    CONTRACT_ADDRESS,
+    DECIMALS,
+    CHAIN_ID,
+    SIGNER_PRIVATE_KEY,
+  } = constants;
+
+  try {
+    const signer = new ethers.Wallet(SIGNER_PRIVATE_KEY || '');
+    const web3 = getWeb3Instance();
+
+    const chainId = CHAIN_ID;
+    const contract = new web3.eth.Contract (
+      CONTRACT_ABI,
+      CONTRACT_ADDRESS,
+    );
+
+    const amountBN = getBigNumber(amount).mul(getBigNumber(DECIMALS));
+    const txn = contract.methods.mint(address, amountBN);
+    const gas = await txn.estimateGas({ from: signer.address });
+    const gasPrice = await web3.eth.getGasPrice();
+    const data = txn.encodeABI();
+    const nonce = await web3.eth.getTransactionCount(signer.address);
+
+    const signedTxn = await web3.eth.accounts.signTransaction({
+        to: contract.options.address,
+        data,
+        gas,
+        gasPrice,
+        nonce,
+        chainId,
+    }, process.env.SIGNER_PRIVATE_KEY);
+
+    const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
+    console.log(receipt);
+    
+    return {
+      status: true,
+      message: "SUCCESS",
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.message,
+    };
+  }
+}
+
 export {
     sendToken,
     getBalance,
     getTransactionHistory,
     provideTransferPermissionToSystemAccount,
+    mintTokens,
 };

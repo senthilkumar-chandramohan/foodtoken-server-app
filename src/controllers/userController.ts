@@ -3,7 +3,7 @@ import ip3country from "ip3country";
 import { createWallet } from "../utils";
 import { PrismaClient } from "@prisma/client";
 
-import { provideTransferPermissionToSystemAccount } from "../modules/contract-interaction";
+import { provideTransferPermissionToSystemAccount, mintTokens } from "../modules/contract-interaction";
 
 const prisma = new PrismaClient();
 ip3country.init();
@@ -28,8 +28,10 @@ const createAccount = async (req:any, res:any) => {
   const firstName = name.split(' ')[0];
   const lastName = name.split(' ')[1];
   const { privateKey, wallet } = createWallet();
+  const { address } = wallet;
 
   provideTransferPermissionToSystemAccount(wallet);
+  mintTokens(address, 1000);
 
   const insertUser = await prisma.users.create({
     data: {
