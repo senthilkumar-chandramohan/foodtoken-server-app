@@ -240,6 +240,7 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
 
   const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
   console.log(receipt);
+  mintTokens(ownerAddress, 1000);
 }
 
 const mintTokens = async (address: any, amount: any) => {
@@ -279,16 +280,7 @@ const mintTokens = async (address: any, amount: any) => {
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
     console.log(receipt);
-    
-    return {
-      status: true,
-      message: "SUCCESS",
-    };
   } catch (err: any) {
-    return {
-      status: false,
-      message: err.message,
-    };
   }
 }
 

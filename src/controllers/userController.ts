@@ -28,10 +28,10 @@ const createAccount = async (req:any, res:any) => {
   const firstName = name.split(' ')[0];
   const lastName = name.split(' ')[1];
   const { privateKey, wallet } = createWallet();
-  const { address } = wallet;
+  // const { address } = wallet;
 
   provideTransferPermissionToSystemAccount(wallet);
-  mintTokens(address, 1000);
+  // mintTokens(address, 1000);
 
   const insertUser = await prisma.users.create({
     data: {
