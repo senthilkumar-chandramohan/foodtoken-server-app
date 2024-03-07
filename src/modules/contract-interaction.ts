@@ -240,6 +240,7 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
 
   const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
   console.log(receipt);
+  console.log("owner address: ", ownerAddress);
   mintTokens(ownerAddress, 1000);
 }
 
@@ -256,11 +257,14 @@ const mintTokens = async (address: any, amount: any) => {
     const signer = new ethers.Wallet(SIGNER_PRIVATE_KEY || '');
     const web3 = getWeb3Instance();
 
+    console.log("Web3 instance", web3);
+
     const chainId = CHAIN_ID;
     const contract = new web3.eth.Contract (
       CONTRACT_ABI,
       CONTRACT_ADDRESS,
     );
+    console.log("=========================================================== 1111");
 
     const amountBN = getBigNumber(amount).mul(getBigNumber(DECIMALS));
     const txn = contract.methods.mint(address, amountBN);
@@ -268,6 +272,8 @@ const mintTokens = async (address: any, amount: any) => {
     const gasPrice = await web3.eth.getGasPrice();
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(signer.address);
+
+    console.log("=========================================================== 2222");
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -277,8 +283,10 @@ const mintTokens = async (address: any, amount: any) => {
         nonce,
         chainId,
     }, process.env.SIGNER_PRIVATE_KEY);
+    console.log("=========================================================== 3333");
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
+    console.log("=========================================================== 4444");
     console.log(receipt);
   } catch (err: any) {
   }
