@@ -114,8 +114,8 @@ const getTransactionHistory = async (address:string) => {
         return {
             timeStamp,
             txnType,
-            ...(txnType === TRANSACTION_TYPE.CREDIT && {from: { name: fromWallet?.firstName + ' ' + fromWallet?.lastName, picture: fromWallet?.picture}}),
-            ...(txnType === TRANSACTION_TYPE.DEBIT && {to: { name: toWallet?.firstName + ' ' + toWallet?.lastName, picture: toWallet?.picture}}),
+            ...(txnType === TRANSACTION_TYPE.CREDIT && {secondParty: { name: fromWallet?.firstName + ' ' + fromWallet?.lastName, picture: fromWallet?.picture}}),
+            ...(txnType === TRANSACTION_TYPE.DEBIT && {secondParty: { name: toWallet?.firstName + ' ' + toWallet?.lastName, picture: toWallet?.picture}}),
             value: value/DECIMALS,
             hash,
         };
