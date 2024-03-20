@@ -14,11 +14,6 @@ const getWeb3Instance = () => {
     return web3Instance;
 };
 
-const getBigNumber = (number:number) => {
-    const web3 = getWeb3Instance();
-    return web3.utils.toBN(number);
-};
-
 const createWallet = () => {
     const id = crypto.randomBytes(32).toString('hex');
     const privateKey = "0x" + id;
@@ -29,6 +24,5 @@ const createWallet = () => {
 
 export {
     getWeb3Instance,
-    getBigNumber,
     createWallet,
 };

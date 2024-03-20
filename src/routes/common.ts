@@ -16,7 +16,7 @@ router.get("/login", async (req, res) => {
   loginUser(req, res);
 });
 
-router.get("/get-balance", async (req, res) => {
+router.get("/token-balance", async (req, res) => {
   const {
     uid
   } = req.user;
@@ -36,7 +36,7 @@ router.get("/get-balance", async (req, res) => {
   res.status(200).json({ balance: balance.toString() });
 });
 
-router.get("/get-txn-history", async (req, res) => {
+router.get("/txn-history", async (req, res) => {
   const {
     uid
   } = req.user;
@@ -56,7 +56,7 @@ router.get("/get-txn-history", async (req, res) => {
   res.status(200).json({ txnHistory });
 });
 
-router.get("/get-app-server-key", async (req, res) => {
+router.get("/app-server-key", async (req, res) => {
   const {
     uid
   } = req.user;
@@ -88,7 +88,7 @@ router.get("/get-app-server-key", async (req, res) => {
   res.json({ publicKey });
 });
 
-router.post("/add-subscription", async (req, res) => {
+router.post("/subscription", async (req, res) => {
   const {
     body,
   } = req;

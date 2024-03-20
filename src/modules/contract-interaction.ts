@@ -2,11 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import { Wallet, ethers } from "ethers";
 import { splitSignature } from "ethers/lib/utils.js";
 
-import { getWeb3Instance, getBigNumber, constants } from "../utils/index";
+import { getWeb3Instance, constants } from "../utils/index";
 
 const prisma = new PrismaClient();
 
-const sendToken = async (sender:string, receiver:string, amount:number, note:string) => {
+const sendToken = async (sender:string, receiver:string, amount:string, note:string) => {
     const web3 = getWeb3Instance();
 
     const {
@@ -23,8 +23,8 @@ const sendToken = async (sender:string, receiver:string, amount:number, note:str
         CONTRACT_ADDRESS,
     );
 
-    const amountBN = getBigNumber(amount).mul(getBigNumber(DECIMALS));
-    const txn = contract.methods.transferFrom(sender, receiver, amountBN);
+    const amountWei = web3.utils.toWei(amount);
+    const txn = contract.methods.transferFrom(sender, receiver, amountWei);
     const gas = await txn.estimateGas({ from: SYSTEM_WALLET });
     const gasPrice = await web3.eth.getGasPrice();
     const data = txn.encodeABI();
@@ -93,7 +93,8 @@ const getTransactionHistory = async (address:string) => {
         select: {
             walletId: true,
             firstName: true,
-            lastName: true
+            lastName: true,
+            picture: true,
         }
     });
 
@@ -113,8 +114,8 @@ const getTransactionHistory = async (address:string) => {
         return {
             timeStamp,
             txnType,
-            ...(txnType === TRANSACTION_TYPE.CREDIT && {from: fromWallet?.firstName + ' ' + fromWallet?.lastName}),
-            ...(txnType === TRANSACTION_TYPE.DEBIT && {to: toWallet?.firstName + ' ' + toWallet?.lastName}),
+            ...(txnType === TRANSACTION_TYPE.CREDIT && {from: { name: fromWallet?.firstName + ' ' + fromWallet?.lastName, picture: fromWallet?.picture}}),
+            ...(txnType === TRANSACTION_TYPE.DEBIT && {to: { name: toWallet?.firstName + ' ' + toWallet?.lastName, picture: toWallet?.picture}}),
             value: value/DECIMALS,
             hash,
         };
@@ -264,16 +265,13 @@ const mintTokens = async (address: any, amount: any) => {
       CONTRACT_ABI,
       CONTRACT_ADDRESS,
     );
-    console.log("=========================================================== 1111");
 
-    const amountBN = getBigNumber(amount).mul(getBigNumber(DECIMALS));
-    const txn = contract.methods.mint(address, amountBN);
+    const amountWei = web3.utils.toWei(amount);
+    const txn = contract.methods.mint(address, amountWei);
     const gas = await txn.estimateGas({ from: signer.address });
     const gasPrice = await web3.eth.getGasPrice();
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(signer.address);
-
-    console.log("=========================================================== 2222");
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -283,10 +281,8 @@ const mintTokens = async (address: any, amount: any) => {
         nonce,
         chainId,
     }, process.env.SIGNER_PRIVATE_KEY);
-    console.log("=========================================================== 3333");
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
-    console.log("=========================================================== 4444");
     console.log(receipt);
   } catch (err: any) {
   }
