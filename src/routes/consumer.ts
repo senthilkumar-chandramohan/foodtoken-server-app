@@ -7,19 +7,31 @@ const prisma = new PrismaClient();
 
 router.get("/sellers", async (req, res) => {
   const {
-    value = '',
-  } = req.query;
+    query: {
+      value = '',
+    },
+    user: {
+      uid,
+    }
+  } = req;
 
   const querySellers = await prisma.users.findMany({
     where: {
       OR: [
         { email: { startsWith: value as string } },
         { phoneNumber: { startsWith: value as string } },
+      ],
+      AND: [
+        { id: { not: uid as string} }
       ]
     },
     select: {
       id: true,
       firstName: true,
+      lastName: true,
+      phoneNumber: true,
+      picture: true,
+      email: true,
     }
   });
 
