@@ -284,6 +284,7 @@ const mintTokens = async (address: any, amount: any) => {
     console.log(`${amount} tokens minted!`);
     console.log(receipt);
   } catch (err: any) {
+    console.log(err);
   }
 }
 
