@@ -242,11 +242,11 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
   // console.log(receipt);
   console.log("owner address: ", ownerAddress);
   setTimeout(() => {
-    mintTokens(ownerAddress, 99999); // Mint tokens after 10s
+    mintTokens(ownerAddress, "99999"); // Mint tokens after 10s
   }, 10000);
 }
 
-const mintTokens = async (address: any, amount: any) => {
+const mintTokens = async (address: string, amount: string) => {
   const {
     CONTRACT_ABI,
     CONTRACT_ADDRESS,
