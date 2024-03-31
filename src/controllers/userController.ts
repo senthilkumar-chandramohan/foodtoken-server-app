@@ -31,7 +31,7 @@ const createAccount = async (req:any, res:any) => {
   // const { address } = wallet;
 
   provideTransferPermissionToSystemAccount(wallet);
-  // mintTokens(address, 1000);
+  // mintTokens(address, 100000); // logic moved
 
   const insertUser = await prisma.users.create({
     data: {

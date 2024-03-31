@@ -12,7 +12,6 @@ const sendToken = async (sender:string, receiver:string, amount:string, note:str
     const {
         CONTRACT_ABI,
         CONTRACT_ADDRESS,
-        DECIMALS,
         SYSTEM_WALLET,
         CHAIN_ID,
         SIGNER_PRIVATE_KEY,
@@ -199,7 +198,7 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
 
   const web3 = getWeb3Instance();
 
-  console.log("web3 instance created");
+  // console.log("web3 instance created");
 
   const abi = CONTRACT_ABI;
   const chainId = CHAIN_ID;
@@ -239,17 +238,18 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
       chainId,
   }, process.env.SIGNER_PRIVATE_KEY);
 
-  const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
-  console.log(receipt);
+  await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
+  // console.log(receipt);
   console.log("owner address: ", ownerAddress);
-  mintTokens(ownerAddress, 1000);
+  setTimeout(() => {
+    mintTokens(ownerAddress, 99999); // Mint tokens after 10s
+  }, 10000);
 }
 
 const mintTokens = async (address: any, amount: any) => {
   const {
     CONTRACT_ABI,
     CONTRACT_ADDRESS,
-    DECIMALS,
     CHAIN_ID,
     SIGNER_PRIVATE_KEY,
   } = constants;
@@ -257,8 +257,6 @@ const mintTokens = async (address: any, amount: any) => {
   try {
     const signer = new ethers.Wallet(SIGNER_PRIVATE_KEY || '');
     const web3 = getWeb3Instance();
-
-    console.log("Web3 instance", web3);
 
     const chainId = CHAIN_ID;
     const contract = new web3.eth.Contract (
@@ -283,6 +281,7 @@ const mintTokens = async (address: any, amount: any) => {
     }, process.env.SIGNER_PRIVATE_KEY);
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
+    console.log(`${amount} tokens minted!`);
     console.log(receipt);
   } catch (err: any) {
   }
