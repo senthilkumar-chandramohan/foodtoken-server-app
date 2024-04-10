@@ -10,7 +10,7 @@ ip3country.init();
 
 const createAccount = async (req:any, res:any) => {
   const {
-    ip = '',
+    clientIp: ip = '',
     user: {
       uid,
       name,
@@ -57,7 +57,7 @@ const createAccount = async (req:any, res:any) => {
 
 const loginUser = async (req: any, res: any) => {
   const {
-    ip = '',
+    clientIp: ip = '',
     user: {
       uid,
     },

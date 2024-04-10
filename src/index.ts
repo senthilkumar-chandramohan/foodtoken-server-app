@@ -1,10 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import requestIp from "request-ip";
+
 import routes from "./routes/index";
 import dotenv from "dotenv";
 import middleware from "./middleware";
-
 import "./modules/txn-listener";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use(middleware.decodeToken);
+app.use(requestIp.mw()); // Middleware to extract IP address
 
 // Use routes
 app.use("/api", routes);
