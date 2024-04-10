@@ -75,8 +75,11 @@ const loginUser = async (req: any, res: any) => {
   });
 
   // console.log(queryUser);
+  console.log("IP of the user", ip);
+  console.log("Country of the user", ip3country.lookupStr(ip));
 
   if (queryUser?.id) {
+
     const country = ip3country.lookupStr(ip) || 'US';
     res.status(200).json({ country });  
   } else {
