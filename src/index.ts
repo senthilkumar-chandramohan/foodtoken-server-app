@@ -6,7 +6,7 @@ import requestIp from "request-ip";
 import routes from "./routes/index";
 import dotenv from "dotenv";
 import middleware from "./middleware";
-import "./modules/txn-listener";
+//import "./modules/txn-listener";
 
 dotenv.config();
 const app = express();
