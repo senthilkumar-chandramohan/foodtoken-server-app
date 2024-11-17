@@ -7,6 +7,7 @@ import { getWeb3Instance, constants } from "../utils/index";
 const prisma = new PrismaClient();
 
 const sendToken = async (sender:string, receiver:string, amount:string, note:string) => {
+  try {
     const web3 = getWeb3Instance();
 
     const {
@@ -41,6 +42,10 @@ const sendToken = async (sender:string, receiver:string, amount:string, note:str
 
     const receipt = await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
     return receipt;
+  }
+  catch(exp) {
+    return null;
+  }
 };
 
 const getBalance = async (address:string) => {
