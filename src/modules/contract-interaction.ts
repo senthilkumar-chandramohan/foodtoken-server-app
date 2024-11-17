@@ -67,19 +67,30 @@ const getBalance = async (address:string) => {
 const getTransactionHistory = async (address:string) => {
     const {
         DECIMALS,
-        POLYGONSCAN_API_KEY,
+        OKLINK_API_KEY,
         TRANSACTION_TYPE,
     } = constants;
 
-    const apiKey = POLYGONSCAN_API_KEY;
-    const reqUrl=`https://api-testnet.polygonscan.com/api?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
+    const apiKey = OKLINK_API_KEY;
+    //const reqUrl=`https://api-testnet.polygonscan.com/api?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
+    const reqUrl=`https://www.oklink.com/api/v5/explorer/address/transaction-list?chainShortName=amoy_testnet&address=${address}&limit=100`;
+    console.log(reqUrl);
 
-    const response = await fetch(reqUrl, { method: 'GET' });
+    const response = await fetch(reqUrl, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+          'Ok-Access-Key': `${apiKey}`
+      }});
+
+    // console.log(response);
     const responseJSON = await response.json();
+    console.log(responseJSON);
 
+    // TODO: Optimize below code
     const allTxnWallets = [
-        ...responseJSON.result.map((transaction:any) => transaction.to),
-        ...responseJSON.result.map((transaction:any) => transaction.from)
+        ...responseJSON.data[0].transactionLists.map((transaction:any) => transaction.to),
+        ...responseJSON.data[0].transactionLists.map((transaction:any) => transaction.from)
     ];
 
     const walletIDNameMap = await prisma.users.findMany({
@@ -97,7 +108,7 @@ const getTransactionHistory = async (address:string) => {
         }
     });
 
-    const filteredResponse = responseJSON.result.map((transaction:any) => {
+    const filteredResponse = responseJSON.data[0].transactionLists.map((transaction:any) => {
         const {
             timeStamp,
             from,
