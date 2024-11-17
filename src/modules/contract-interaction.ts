@@ -44,6 +44,7 @@ const sendToken = async (sender:string, receiver:string, amount:string, note:str
     return receipt;
   }
   catch(exp) {
+    console.log(exp);
     return null;
   }
 };
