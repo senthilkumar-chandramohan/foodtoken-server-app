@@ -26,7 +26,7 @@ const sendToken = async (sender:string, receiver:string, amount:string, note:str
     const amountWei = web3.utils.toWei(amount);
     const txn = contract.methods.transferFrom(sender, receiver, amountWei);
     const gas = await txn.estimateGas({ from: SYSTEM_WALLET });
-    const gasPrice = await web3.eth.getGasPrice()*1.4; // To improve mining chances
+    const gasPrice = await web3.eth.getGasPrice()*2; // To improve mining chances
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(SYSTEM_WALLET);
     const chainId = CHAIN_ID;
@@ -242,7 +242,7 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet) => {
 
   const txn = contract.methods.permit(ownerAddress, spenderAddress, value, deadline, v, r, s);
   const gas = await txn.estimateGas({ from: signer.address });
-  const gasPrice = await web3.eth.getGasPrice();
+  const gasPrice = await web3.eth.getGasPrice()*1.5;
   const data = txn.encodeABI();
   const accountNonce = await web3.eth.getTransactionCount(signer.address);
 
@@ -284,7 +284,7 @@ const mintTokens = async (address: string, amount: string) => {
     const amountWei = web3.utils.toWei(amount);
     const txn = contract.methods.mint(address, amountWei);
     const gas = await txn.estimateGas({ from: signer.address });
-    const gasPrice = await web3.eth.getGasPrice();
+    const gasPrice = await web3.eth.getGasPrice()*1.5;
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(signer.address);
 

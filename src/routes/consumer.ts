@@ -79,7 +79,11 @@ router.post("/token", async (req, res) => {
   } 
 
   const receipt = await sendToken(fromWalletAddress, toWalletAddress, amount, note);
-  res.status(200).json(receipt);
+  if (receipt) {
+    res.status(200).json(receipt);
+  } else {
+    res.status(500).send();
+  }
 });
 
 export default router;
