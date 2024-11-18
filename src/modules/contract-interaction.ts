@@ -6,7 +6,7 @@ import { getWeb3Instance, constants } from "../utils/index";
 
 const prisma = new PrismaClient();
 
-const sendToken = async (sender:string, receiver:string, amount:string, recurrence:number = 0) => {
+const sendToken:any = async (sender:string, receiver:string, amount:string, recurrence:number = 0) => {
   const recurrenceLimit = 5 // Number of times you want to retry
   console.log(recurrence);
   if (recurrence>=recurrenceLimit) {
@@ -209,7 +209,7 @@ const _getPermitSignature = async (
   );
 }
 
-const provideTransferPermissionToSystemAccount = async (wallet:Wallet, recurrence:number = 0) => {
+const provideTransferPermissionToSystemAccount:any = async (wallet:Wallet, recurrence:number = 0) => {
   const recurrenceLimit = 5 // Number of times you want to retry
   console.log(recurrence);
   if (recurrence>=recurrenceLimit) {
@@ -289,7 +289,7 @@ const provideTransferPermissionToSystemAccount = async (wallet:Wallet, recurrenc
   }
 }
 
-const mintTokens = async (address: string, amount: string, recurrence:number = 0) => {
+const mintTokens:any = async (address: string, amount: string, recurrence:number = 0) => {
   const recurrenceLimit = 5 // Number of times you want to retry
   console.log(recurrence);
   if (recurrence>=recurrenceLimit) {
