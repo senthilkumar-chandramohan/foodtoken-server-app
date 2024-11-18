@@ -35,12 +35,12 @@ const sendToken:any = async (sender:string, receiver:string, amount:string, recu
     const amountWei = web3.utils.toWei(amount);
     const txn = contract.methods.transferFrom(sender, receiver, amountWei);
     const gas = await txn.estimateGas({ from: SYSTEM_WALLET }); // To improve mining chances
-    const gasPrice = await web3.eth.getGasPrice() * gasPremium;
+    const gasPrice = Math.ceil(await web3.eth.getGasPrice() * gasPremium);
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(SYSTEM_WALLET);
     const chainId = CHAIN_ID;
 
-    console.log(`Executing txn with gas: ${gas}, premium: ${gasPremium}`);
+    console.log(`Executing txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -263,9 +263,11 @@ const provideTransferPermissionToSystemAccount:any = async (wallet:Wallet, recur
 
     const txn = contract.methods.permit(ownerAddress, spenderAddress, value, deadline, v, r, s);
     const gas = await txn.estimateGas({ from: signer.address });
-    const gasPrice = await web3.eth.getGasPrice() * gasPremium;
+    const gasPrice = Math.ceil(await web3.eth.getGasPrice() * gasPremium);
     const data = txn.encodeABI();
     const accountNonce = await web3.eth.getTransactionCount(signer.address);
+
+    console.log(`Executing txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -319,9 +321,11 @@ const mintTokens:any = async (address: string, amount: string, recurrence:number
     const amountWei = web3.utils.toWei(amount);
     const txn = contract.methods.mint(address, amountWei);
     const gas = await txn.estimateGas({ from: signer.address });
-    const gasPrice = await web3.eth.getGasPrice() * gasPremium;
+    const gasPrice = Math.ceil(await web3.eth.getGasPrice() * gasPremium);
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(signer.address);
+    
+    console.log(`Executing txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
     
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
