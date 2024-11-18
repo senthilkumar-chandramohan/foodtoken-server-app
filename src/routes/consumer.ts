@@ -78,7 +78,7 @@ router.post("/token", async (req, res) => {
     res.status(400).json({"error": "Error, seller doesn't exist, please try again!"});
   } 
 
-  const receipt = await sendToken(fromWalletAddress, toWalletAddress, amount, note);
+  const receipt = await sendToken(fromWalletAddress, toWalletAddress, amount);
   if (receipt) {
     res.status(200).json(receipt);
   } else {
