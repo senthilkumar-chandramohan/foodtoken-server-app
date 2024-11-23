@@ -6,8 +6,8 @@ const SYSTEM_WALLET = process.env.SYSTEM_WALLET;
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
 const OKLINK_API_KEY = process.env.OKLINK_API_KEY;
 const CHAIN_ID = process.env.CHAIN_ID;
-const CHAIN_HTTP_PROVIDER = process.env.HTTP_PROVIDER;
-const CHAIN_WS_PROVIDER = process.env.WS_PROVIDER;
+const CHAIN_HTTP_PROVIDER = process.env.CHAIN_HTTP_PROVIDER;
+const CHAIN_WS_PROVIDER = process.env.CHAIN_WS_PROVIDER;
 
 const DECIMALS = 1000000000000000000;
 
