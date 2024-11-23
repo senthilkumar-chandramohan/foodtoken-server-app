@@ -1,13 +1,14 @@
 import Web3 from "web3";
 import crypto from "crypto";
 import { ethers } from "ethers";
+import { CHAIN_HTTP_PROVIDER } from "./constants";
 
 let web3Instance:any = null;
 
 const getWeb3Instance = () => {
     if (!web3Instance) {
         web3Instance = new Web3 (
-            new Web3.providers.HttpProvider(process.env.POLYGON_HTTP_PROVIDER || '')
+            new Web3.providers.HttpProvider(CHAIN_HTTP_PROVIDER || '')
         );
     }
 

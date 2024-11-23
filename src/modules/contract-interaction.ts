@@ -83,21 +83,19 @@ const getBalance = async (address:string) => {
 
 const getTransactionHistory = async (address:string) => {
     const {
-        DECIMALS,
         OKLINK_API_KEY,
         TRANSACTION_TYPE,
     } = constants;
 
-    const apiKey = OKLINK_API_KEY;
     //const reqUrl=`https://api-testnet.polygonscan.com/api?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
-    const reqUrl=`https://www.oklink.com/api/v5/explorer/address/transaction-list?chainShortName=amoy_testnet&address=${address}&limit=100`;
+    const reqUrl=`https://www.oklink.com/api/v5/explorer/address/token-transaction-list?chainShortName=sepolia_testnet&address=${address}&limit=100`;
     console.log(reqUrl);
 
     const response = await fetch(reqUrl, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
-          'Ok-Access-Key': `${apiKey}`
+          'Ok-Access-Key': `${OKLINK_API_KEY}`
       }});
 
     // console.log(response);
@@ -106,8 +104,8 @@ const getTransactionHistory = async (address:string) => {
 
     // TODO: Optimize below code
     const allTxnWallets = [
-        ...responseJSON.data[0].transactionLists.map((transaction:any) => transaction.to),
-        ...responseJSON.data[0].transactionLists.map((transaction:any) => transaction.from)
+        ...responseJSON.data[0].transactionList.map((transaction:any) => transaction.to),
+        ...responseJSON.data[0].transactionList.map((transaction:any) => transaction.from)
     ];
 
     const walletIDNameMap = await prisma.users.findMany({
@@ -125,13 +123,13 @@ const getTransactionHistory = async (address:string) => {
         }
     });
 
-    const filteredResponse = responseJSON.data[0].transactionLists.map((transaction:any) => {
+    const filteredResponse = responseJSON.data[0].transactionList.map((transaction:any) => {
         const {
-            timeStamp,
-            from,
-            to,
-            value,
-            hash,
+          transactionTime,
+          from,
+          to,
+          amount,
+          txId,
         } = transaction;
 
         const txnType = to === address.toLowerCase() ? TRANSACTION_TYPE.CREDIT : TRANSACTION_TYPE.DEBIT;
@@ -139,12 +137,12 @@ const getTransactionHistory = async (address:string) => {
         const toWallet = walletIDNameMap.find(wallet=>wallet.walletId.toLowerCase() === to.toLowerCase());
 
         return {
-            timeStamp,
+            timeStamp: transactionTime/1000, // converting ms to s
             txnType,
             ...(txnType === TRANSACTION_TYPE.CREDIT && {secondParty: { name: fromWallet?.firstName + ' ' + fromWallet?.lastName, picture: fromWallet?.picture}}),
             ...(txnType === TRANSACTION_TYPE.DEBIT && {secondParty: { name: toWallet?.firstName + ' ' + toWallet?.lastName, picture: toWallet?.picture}}),
-            value: value/DECIMALS,
-            hash,
+            value: amount,
+            hash: txId,
         };
     });
 
@@ -267,7 +265,7 @@ const provideTransferPermissionToSystemAccount:any = async (wallet:Wallet, recur
     const data = txn.encodeABI();
     const accountNonce = await web3.eth.getTransactionCount(signer.address);
 
-    console.log(`Executing txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
+    console.log(`Executing permit txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
 
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,
@@ -280,7 +278,7 @@ const provideTransferPermissionToSystemAccount:any = async (wallet:Wallet, recur
 
     await web3.eth.sendSignedTransaction(signedTxn.rawTransaction);
     // console.log(receipt);
-    console.log("owner address: ", ownerAddress);
+    console.log(`Owner address: ${ownerAddress}`);
     setTimeout(() => {
       mintTokens(ownerAddress, "99999"); // Mint tokens after 10s
     }, 10000);
@@ -325,7 +323,7 @@ const mintTokens:any = async (address: string, amount: string, recurrence:number
     const data = txn.encodeABI();
     const nonce = await web3.eth.getTransactionCount(signer.address);
     
-    console.log(`Executing txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
+    console.log(`Executing mint txn with gasPrice: ${gasPrice}, premium: ${gasPremium}`);
     
     const signedTxn = await web3.eth.accounts.signTransaction({
         to: contract.options.address,

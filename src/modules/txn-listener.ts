@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 
 (async () => {
     const {
-        POLYGON_WS_PROVIDER,
+        CHAIN_WS_PROVIDER,
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
     } = constants;
 
-    const provider = new ethers.providers.WebSocketProvider(POLYGON_WS_PROVIDER || "");
+    const provider = new ethers.providers.WebSocketProvider(CHAIN_WS_PROVIDER || "");
     const contract = new ethers.Contract(CONTRACT_ADDRESS || "", CONTRACT_ABI, provider);
 
     contract.on("Transfer", async (from, to, value, event) => {
