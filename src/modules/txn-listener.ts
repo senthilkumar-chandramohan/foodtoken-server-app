@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
         CONTRACT_ABI,
     } = constants;
 
+    console.log(CHAIN_WS_PROVIDER);
     const provider = new ethers.providers.WebSocketProvider(CHAIN_WS_PROVIDER || "");
     const contract = new ethers.Contract(CONTRACT_ADDRESS || "", CONTRACT_ABI, provider);
 
